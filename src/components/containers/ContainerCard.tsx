@@ -10,16 +10,26 @@ import { useContainerStatsContext } from '../../context/ContainerStatsContext';
 import { formatPercentage, formatBytes } from '../../utils/format';
 import { Dialog } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import {CommandLineIcon} from "@heroicons/react/24/solid";
+import ContainerTerminal from "./terminal/ContainerTerminal.tsx";
+import LoadingSpinner from "../shared/LoadingSpinner.tsx";
 
 interface ContainerCardProps {
   container: Container;
 }
 
 export default function ContainerCard({ container }: ContainerCardProps) {
+  const [showTerminal, setShowTerminal] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [showFiles, setShowFiles] = useState(false);
   const { stats } = useContainerStatsContext();
   const containerStats = stats[container.id];
+  if (!containerStats) {
+    return (
+        <LoadingSpinner />
+    );
+  }
+  const latestStats = containerStats[containerStats.length - 1];
 
   return (
     <>
@@ -33,6 +43,13 @@ export default function ContainerCard({ container }: ContainerCardProps) {
           />
           
           <div className="flex space-x-2">
+            <button
+              onClick={() => setShowTerminal(true)}
+              className="inline-flex items-center p-1 border border-transparent rounded-full text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              title="Terminal"
+            >
+                <CommandLineIcon className="h-5 w-5" />
+            </button>
             <button
               onClick={() => setShowFiles(true)}
               className="inline-flex items-center p-1 border border-transparent rounded-full text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -60,15 +77,15 @@ export default function ContainerCard({ container }: ContainerCardProps) {
           <ContainerStatus state={container.state} />
         </div>
 
-        {containerStats && (
+        {latestStats && (
             <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-500">CPU:</span>
-                <div className="mt-1">{formatPercentage(containerStats.cpu_usage)}</div>
+                <div className="mt-1">{formatPercentage(latestStats.cpu_usage)}</div>
               </div>
               <div>
                 <span className="text-gray-500">Memory:</span>
-                <div className="mt-1">{formatBytes(containerStats.memory_usage)}</div>
+                <div className="mt-1">{formatBytes(latestStats.memory_usage)}</div>
               </div>
             </div>
         )}
@@ -79,6 +96,8 @@ export default function ContainerCard({ container }: ContainerCardProps) {
         isOpen={showLogs}
         onClose={() => setShowLogs(false)}
       />
+
+      <ContainerTerminal containerId={container.id} isOpen={showTerminal} onClose={() => setShowTerminal(false)} />
 
       <Dialog
         open={showFiles}

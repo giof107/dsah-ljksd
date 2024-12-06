@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Containers from './pages/Containers';
 import Databases from './pages/Databases';
 import { AuthProvider } from './context/AuthContext';
+import Traefik from "./pages/Traefik.tsx";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/containers" element={<Containers />} />
                     <Route path="/databases" element={<Databases />} />
+                    <Route path="/traefik" element={<Traefik />} />
                   </Routes>
                 </div>
               </main>

@@ -3,7 +3,7 @@ import { useContainerStats } from '../hooks/useContainerStats';
 import { Container, ContainerStats } from '../types';
 
 interface ContainerStatsContextType {
-  stats: Record<string, ContainerStats>;
+  stats: Record<string, ContainerStats[]>;
 }
 
 const ContainerStatsContext = createContext<ContainerStatsContextType | null>(null);
